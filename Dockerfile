@@ -8,8 +8,8 @@ COPY package*.json ./
 COPY client/package*.json ./client/
 COPY server/package*.json ./server/
 
-# Install dependencies
-RUN npm ci --omit=dev
+# Install ALL dependencies (including dev) for building
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -22,15 +22,15 @@ FROM node:18-alpine AS production
 
 WORKDIR /app
 
-# Copy built application
+# Copy built application and data
 COPY --from=builder /app/server/dist ./server/dist
 COPY --from=builder /app/client/dist ./client/dist
 COPY --from=builder /app/server/data ./server/data
 COPY --from=builder /app/server/package*.json ./server/
-COPY --from=builder /app/node_modules ./node_modules
 
-# Set working directory to server
+# Install only production dependencies for server
 WORKDIR /app/server
+RUN npm ci --omit=dev
 
 # Expose port
 EXPOSE 8000
