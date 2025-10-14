@@ -97,6 +97,16 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
   next();
 });
 
+// Health check endpoint for Railway
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: config.nodeEnv
+  });
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 
