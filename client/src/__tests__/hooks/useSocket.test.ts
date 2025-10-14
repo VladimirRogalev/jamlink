@@ -1,11 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { useSocket } from '../../hooks/useSocket';
-import logger from '../../utils/logger';
 
 // Mock the logger
 jest.mock('../../utils/logger');
-
-const mockLogger = logger as jest.Mocked<typeof logger>;
 
 // Mock Redux
 jest.mock('../../hooks/redux-hooks', () => ({

@@ -10,7 +10,7 @@ const SearchSongs: React.FC = () => {
   const dispatch = useAppDispatch();
   const { searchQuery, searchLoading } = useAppSelector((state) => state.songs);
   const [inputValue, setInputValue] = useState(searchQuery);
-  const timeoutRef = useRef<number>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const debouncedSearch = useCallback(
     (query: string) => {

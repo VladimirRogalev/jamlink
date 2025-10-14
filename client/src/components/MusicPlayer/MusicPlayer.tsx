@@ -22,7 +22,7 @@ export default function MusicPlayer({ song, instrument }: MusicPlayerProps) {
   );
 
   useEffect(() => {
-    let intervalId: number;
+    let intervalId: NodeJS.Timeout;
     if (isScrolling) {
       intervalId = setInterval(() => {
         setCurrentLineIndex((prevIndex) => {

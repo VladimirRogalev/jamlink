@@ -67,6 +67,40 @@ jobs:
         flags: client
         name: client-coverage
 
+  notify:
+    needs: [test, lint, build]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Notify Telegram
+      uses: appleboy/telegram-action@v1.0.3
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          🚀 **JamLink CI Status**
+          
+          📊 **Test Results:**
+          - Server Tests: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+          - Client Tests: ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+          
+          🔍 **Linting:**
+          - Status: ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }}
+          
+          🏗️ **Build:**
+          - Status: ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }}
+          
+          🚂 **Railway Deploy:**
+          - Status: ${{ github.ref == 'refs/heads/main' && '🚀 Auto-deploying...' || '⏭️ Skipped (not main branch)' }}
+          - Note: Railway автоматически деплоит при push в main
+          
+          📝 **Commit:** ${{ github.sha }}
+          🌿 **Branch:** ${{ github.ref_name }}
+          👤 **Author:** ${{ github.actor }}
+          
+          🔗 **View Details:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
   lint:
     runs-on: ubuntu-latest
     
