@@ -1,0 +1,35 @@
+{
+  "name": "jamlink",
+  "version": "1.0.0",
+  "description": "Chords and lyrics app",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd server && npm run build && cd ../client && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VladimirRogalev/jamlink.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/VladimirRogalev/jamlink/issues"
+  },
+  "homepage": "https://github.com/VladimirRogalev/jamlink#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "jamlink": "file:"
+  }
+}

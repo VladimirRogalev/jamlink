@@ -1,0 +1,132 @@
+@use "../../style/variables";
+@use "sass:color";
+
+.playerContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 75vh;
+  overflow-y: auto;
+
+  &.rtlText {
+    direction: rtl;
+    .header:not(.rtl) {
+      flex-direction: row-reverse;
+      @media (max-width: variables.$breakpoint-sm) {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+    }
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: color.adjust(variables.$yellow, $lightness: 10%);
+    border-radius: 10px;
+  }
+
+  @media (max-width: variables.$breakpoint-sm) {
+    max-height: 80vh;
+  }
+}
+
+.header {
+  display: flex;
+  gap: 2rem;
+  align-items: baseline;
+  justify-content: center;
+  padding-bottom: 2rem;
+
+  @media (max-width: variables.$breakpoint-sm) {
+    flex-direction: column;
+    padding: 2rem;
+    gap: 0;
+
+    &.rtl {
+      align-items: flex-start;
+    }
+  }
+
+  h1 {
+    font-size: 5rem;
+    font-weight: 700;
+    color: variables.$brown;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  h2 {
+    font-size: 3rem;
+    color: color.adjust(variables.$black, $lightness: 20%);
+    font-weight: 500;
+  }
+}
+
+.lyricsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  line-height: 1.6;
+  align-items: center;
+}
+
+.line {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  transition: background-color 0.3s;
+  border-radius: 0.6rem;
+  align-items: flex-end;
+  gap: 1rem;
+
+  &.activeLine {
+    background-color: rgba(variables.$yellow, 0.25);
+    box-shadow: 0 0 0 4px rgba(variables.$yellow, 0.25);
+    transform: scale(1.02);
+  }
+
+  &.reverse {
+    align-items: flex-end;
+    .wordContainer {
+      flex-direction: column-reverse;
+    }
+  }
+}
+
+.wordContainer {
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+}
+
+.chord {
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: black;
+  text-align: center;
+  min-height: 2.4rem;
+  background-color: rgba(variables.$yellow, 0.4);
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.3rem;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+}
+
+.lyric {
+  font-size: 3.8rem;
+  color: black;
+  font-weight: 500;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+  min-height: 6rem;
+}

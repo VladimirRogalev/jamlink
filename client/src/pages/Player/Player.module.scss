@@ -1,0 +1,100 @@
+@use "../../style/variables";
+
+.container {
+  flex: 1;
+  margin: 4rem;
+  padding: 2rem;
+  border-radius: 0.8rem;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &.playing {
+    align-items: baseline;
+  }
+
+  &:not(.playing):not(.admin) {
+    border: none;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23333' stroke-width='5' stroke-dasharray='2%2c 15' stroke-dashoffset='16' stroke-linecap='square'/%3e%3c/svg%3e");
+  }
+
+  &.admin:not(.playing) {
+    border: none;
+  }
+
+  .noSongContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .notesContainer {
+      position: relative;
+      height: 8.8rem;
+      width: 8.8rem;
+
+      & > :first-child {
+        position: absolute;
+      }
+      & > :last-child {
+        position: absolute;
+        top: 2rem;
+        left: 4rem;
+        @media (max-width: variables.$breakpoint-sm) {
+          top: 2.5rem;
+          left: 4.5rem;
+        }
+      }
+    }
+
+    .waitingMessage {
+      font-size: 3.8rem;
+      font-weight: 500;
+    }
+  }
+
+  .quit {
+    position: fixed;
+    max-width: 10rem;
+    bottom: variables.$bottom-position;
+    right: 46%;
+  }
+
+  .connectionStatus {
+    position: absolute;
+    bottom: 1.6rem;
+    left: 1.6rem;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 0.8rem 1.6rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.4rem;
+    color: variables.$error-color;
+
+    .disconnectedIndicator {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      background-color: variables.$error-color;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  @media (max-width: variables.$breakpoint-sm) {
+    margin: 2rem;
+    padding: 0;
+
+    .quit {
+      bottom: variables.$mobile-bottom-position;
+      left: 10%;
+      &.rtl {
+        left: auto;
+        right: 10%;
+      }
+    }
+  }
+}
