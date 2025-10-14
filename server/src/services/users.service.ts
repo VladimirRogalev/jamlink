@@ -4,6 +4,8 @@ import { IUser, UserRole, IGoogleUserProfile } from "../models/types";
 import { hashPassword } from "../utils/auth";
 import { randomUUID } from "crypto";
 import { getGroupById, getGroupByName } from "./groups.service";
+import logger from "../utils/logger";
+import { createErrorLog } from "../utils/errorHandler";
 
 const users: IUser[] = [];
 const usersFilePath = path.join(__dirname, "..", "..", "data", "users.json");
@@ -21,16 +23,16 @@ export async function loadUsers(): Promise<void> {
       try {
         const parsedUsers = JSON.parse(data);
         users.splice(0, users.length, ...parsedUsers);
-        console.log(`Loaded ${users.length} users from file`);
+        logger.info(`Loaded ${users.length} users from file`);
         resolve();
       } catch (error) {
-        console.error("Error parsing users data:", error);
+        logger.error("Error parsing users data", createErrorLog(error));
         reject(error);
       }
     });
 
     readStream.on("error", (error) => {
-      console.error("Error reading users file:", error);
+      logger.error("Error reading users file", createErrorLog(error));
       reject(error);
     });
   });
@@ -229,17 +231,20 @@ async function saveUsers(): Promise<void> {
       });
 
       writeStream.on("finish", () => {
-        console.log("Users saved to file", fileContent);
+        logger.info("Users saved to file successfully", { 
+          userCount: users.length,
+          fileSize: fileContent.length 
+        });
         resolve();
       });
 
       writeStream.on("error", (error) => {
-        console.error("Error writing users file:", error);
+        logger.error("Error writing users file", createErrorLog(error));
         reject(error);
       });
     });
   } catch (error) {
-    console.error("Error saving users:", error);
+    logger.error("Error saving users", createErrorLog(error));
     throw new Error("Failed to save users data");
   }
 }

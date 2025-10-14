@@ -8,13 +8,18 @@
     "start": "node dist/index.js",
     "dev": "nodemon --config nodemon.json src/index.ts",
     "check-client": "node scripts/check-client-build.js",
-    "predev": "node scripts/check-client-build.js"
+    "predev": "node scripts/check-client-build.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --watchAll=false"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@types/winston": "^2.4.4",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "cheerio": "^1.0.0",
@@ -30,18 +35,24 @@
     "server": "file:",
     "socket.io": "^4.8.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "winston": "^3.18.3"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
     "@types/cookie-session": "^2.0.49",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.14.1",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-local": "^1.0.38",
     "@types/socket.io": "^3.0.1",
-    "nodemon": "^3.1.5"
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.5",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5"
   }
 }

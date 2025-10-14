@@ -13,6 +13,8 @@ import {
   QuitSongData,
 } from "./types";
 import { loadActiveSongs } from "../services/activeSongs.service";
+import logger from "../utils/logger";
+import { createErrorLog } from "../utils/errorHandler";
 
 const userSockets = new Map<string, Set<string>>();
 const userGroups = new Map<string, string>();
@@ -55,7 +57,7 @@ export async function initializeController(): Promise<void> {
       activeGroupSongs.set(groupId, songId);
     });
   } catch (error) {
-    console.error("Error initializing socket controller:", error);
+    logger.error("Error initializing socket controller", createErrorLog(error));
   }
 }
 
@@ -153,7 +155,7 @@ function setupSocketEventListeners(
     try {
       handleAuthenticate(io, socket, data);
     } catch (error) {
-      console.error("Error handling authenticate event:", error);
+      logger.error("Error handling authenticate event", createErrorLog(error, { userId: data.userId }));
       socket.disconnect();
     }
   });
@@ -162,7 +164,7 @@ function setupSocketEventListeners(
     try {
       handleSelectSong(io, socket, data);
     } catch (error) {
-      console.error("Error handling select_song event:", error);
+      logger.error("Error handling select_song event", createErrorLog(error, { userId: data.userId, songId: data.songId }));
     }
   });
 
@@ -170,7 +172,7 @@ function setupSocketEventListeners(
     try {
       handleQuitSong(io, data);
     } catch (error) {
-      console.error("Error handling quit_song event:", error);
+      logger.error("Error handling quit_song event", createErrorLog(error, { userId: data.userId }));
     }
   });
 
@@ -178,7 +180,7 @@ function setupSocketEventListeners(
     try {
       handleGetActiveSong(socket, callback);
     } catch (error) {
-      console.error("Error handling get_active_song event:", error);
+      logger.error("Error handling get_active_song event", createErrorLog(error, { userId: socket.data.userId }));
       callback(null);
     }
   });

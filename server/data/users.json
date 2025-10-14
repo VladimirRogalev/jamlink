@@ -7,5 +7,14 @@
     "role": "admin",
     "id": "749ee2ae-8a30-4bd0-8d04-0348dd1d9021",
     "groupId": "b16b0efa-9456-449e-8d1a-2298d0b4b4a1"
+  },
+  {
+    "username": "admin",
+    "password": "$2b$10$E.WmavpJT3.eVIPI8pdHLea84TJtI3NHDN5HxmPcmqFhWBUH2Owru",
+    "email": "vova.roglev@gmail.com",
+    "instrument": "drums",
+    "role": "user",
+    "id": "c70db6d4-ff7f-43e8-a2fb-a8a62248f9ff",
+    "groupId": "b16b0efa-9456-449e-8d1a-2298d0b4b4a1"
   }
 ]

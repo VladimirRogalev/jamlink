@@ -2,6 +2,8 @@ import { createReadStream, createWriteStream } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { IGroup } from "../models/types";
+import logger from "../utils/logger";
+import { createErrorLog } from "../utils/errorHandler";
 
 const groups: IGroup[] = [];
 const groupsFilePath = path.join(__dirname, "..", "..", "data", "groups.json");
@@ -19,16 +21,16 @@ export async function loadGroups(): Promise<void> {
       try {
         const parsedGroups = JSON.parse(data);
         groups.splice(0, groups.length, ...parsedGroups);
-        console.log(`Loaded ${groups.length} groups from file`);
+        logger.info(`Loaded ${groups.length} groups from file`);
         resolve();
       } catch (error) {
-        console.error("Error parsing groups data:", error);
+        logger.error("Error parsing groups data", createErrorLog(error));
         reject(error);
       }
     });
 
     readStream.on("error", (error) => {
-      console.error("Error reading groups file:", error);
+      logger.error("Error reading groups file", createErrorLog(error));
       reject(error);
     });
   });
@@ -112,17 +114,20 @@ async function saveGroups(): Promise<void> {
       });
 
       writeStream.on("finish", () => {
-        console.log("Groups saved to file", fileContent);
+        logger.info("Groups saved to file successfully", { 
+          groupCount: groups.length,
+          fileSize: fileContent.length 
+        });
         resolve();
       });
 
       writeStream.on("error", (error) => {
-        console.error("Error writing groups file:", error);
+        logger.error("Error writing groups file", createErrorLog(error));
         reject(error);
       });
     });
   } catch (error) {
-    console.error("Error saving groups:", error);
+    logger.error("Error saving groups", createErrorLog(error));
     throw new Error("Failed to save groups data");
   }
 }

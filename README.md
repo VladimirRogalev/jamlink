@@ -146,7 +146,7 @@ jamlink/
 ## 🌐 Deployment
 
 ### Production
-The application is deployed and available at: ****
+The application is deployed and available at: **https://jamlink-production.up.railway.app**
 
 ### Local Build
 ```bash

@@ -2,6 +2,8 @@ import { createReadStream, createWriteStream } from "fs";
 import path from "path";
 import { ISong } from "../models/types";
 import { randomUUID } from "crypto";
+import logger from "../utils/logger";
+import { createErrorLog } from "../utils/errorHandler";
 
 const songs: ISong[] = [];
 const songsFilePath = path.join(__dirname, "..", "..", "data", "songs.json");
@@ -39,19 +41,19 @@ export async function loadSongs(): Promise<void> {
       try {
         const parsedSongs = JSON.parse(data);
         songs.push(...parsedSongs);
-        console.log(`Loaded ${songs.length} songs from file`);
+        logger.info(`Loaded ${songs.length} songs from file`);
         songs.forEach((song) => {
           addSongToMap(song);
         });
         resolve();
       } catch (error) {
-        console.error("Error loading songs:", error);
+        logger.error("Error loading songs", createErrorLog(error));
         reject(error);
       }
     });
 
     readStream.on("error", (error) => {
-      console.error("Error loading songs:", error);
+      logger.error("Error loading songs", createErrorLog(error));
       reject(error);
     });
   });
@@ -89,7 +91,7 @@ async function saveSongs(): Promise<void> {
 
       writeStream.write(data, (err) => {
         if (err) {
-          console.error("Error saving songs:", err);
+          logger.error("Error saving songs", createErrorLog(err));
           reject(new Error("Failed to save songs data"));
           return;
         }
@@ -97,16 +99,16 @@ async function saveSongs(): Promise<void> {
       });
 
       writeStream.on("finish", () => {
-        console.log("Songs saved to file");
+        logger.info("Songs saved to file successfully", { songCount: songs.length });
         resolve();
       });
 
       writeStream.on("error", (error) => {
-        console.error("Error saving songs:", error);
+        logger.error("Error saving songs", createErrorLog(error));
         reject(new Error("Failed to save songs data"));
       });
     } catch (error) {
-      console.error("Error saving songs:", error);
+      logger.error("Error saving songs", createErrorLog(error));
       reject(new Error("Failed to save songs data"));
     }
   });

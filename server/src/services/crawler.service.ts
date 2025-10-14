@@ -2,6 +2,8 @@ import axios from "axios";
 import { CheerioAPI, load } from "cheerio";
 import { ISong, ISongItem } from "../models/types";
 import { addSong, hasAddedSong } from "./songs.service";
+import logger from "../utils/logger";
+import { createErrorLog } from "../utils/errorHandler";
 
 export const CHORDS_URL = "https://www.tab4u.com";
 
@@ -48,7 +50,7 @@ export async function crawlPopularSongs(limit = 10): Promise<CrawlerResult> {
           return addSong(songData);
         })
         .catch((error) => {
-          console.error(`Error processing song URL ${songUrl}:`, error);
+          logger.error("Error processing song URL", createErrorLog(error, { songUrl }));
           return null;
         })
     );
@@ -70,7 +72,7 @@ export async function crawlPopularSongs(limit = 10): Promise<CrawlerResult> {
       hasMore,
     };
   } catch (error) {
-    console.error("Error crawling popular songs:", error);
+    logger.error("Error crawling popular songs", createErrorLog(error));
     throw new Error("Failed to crawl popular songs");
   }
 }

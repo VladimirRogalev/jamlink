@@ -12,6 +12,10 @@ import { usersRouter } from "./routes/users.router";
 import { groupsRouter } from "./routes/groups.router";
 import { crawlerRouter } from "./routes/crawler.router";
 import { CHORDS_URL } from "./services/crawler.service";
+import path from 'path';
+import logger from "./utils/logger";
+import { createErrorLog } from "./utils/errorHandler";
+
 
 const app = express();
 
@@ -97,7 +101,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req: Request, _res: Response, next: NextFunction) => {
-  console.log(`${new Date().toISOString()} | ${req.method} ${req.url}`);
+  logger.http(`${req.method} ${req.url}`, { 
+    method: req.method, 
+    url: req.url, 
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  });
   next();
 });
 
@@ -127,13 +136,14 @@ if (config.nodeEnv === "development") {
         }
       } else {
         // No dist folder, redirect to client dev server
-        console.log(
-          `Redirecting ${req.url} to client dev server at ${config.clientUrl}`
-        );
+        logger.info(`Redirecting to client dev server`, { 
+          originalUrl: req.url, 
+          clientUrl: config.clientUrl 
+        });
         return res.redirect(`${config.clientUrl}${req.url}`);
       }
     } catch (err) {
-      console.error("Error serving client files:", err);
+      logger.error("Error serving client files", createErrorLog(err, { url: req.url }));
       return res.redirect(`${config.clientUrl}${req.url}`);
     }
   });
@@ -178,7 +188,7 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   const error = toErrorWithMessage(err);
-  console.error("Error:", error);
+  logger.error("Unhandled application error", createErrorLog(error));
 
   res.status(500).json({
     success: false,
@@ -188,12 +198,18 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Error:", err);
+  logger.error("Process error", createErrorLog(err));
   res.status(500).json({
     success: false,
     error: "Internal Server Error",
     message: config.nodeEnv === "development" ? err.message : undefined,
   });
 });
+
+app.use('/favicon.ico', express.static(path.join(__dirname, '../../client/public/favicon.ico')));
+app.use('/favicon-16x16.png', express.static(path.join(__dirname, '../../client/public/favicon-16x16.png')));
+app.use('/favicon-32x32.png', express.static(path.join(__dirname, '../../client/public/favicon-32x32.png')));
+app.use('/apple-touch-icon.png', express.static(path.join(__dirname, '../../client/public/apple-touch-icon.png')));
+app.use('/site.webmanifest', express.static(path.join(__dirname, '../../client/public/site.webmanifest')));
 
 export default app;

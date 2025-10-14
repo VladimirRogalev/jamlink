@@ -9,6 +9,8 @@ import {
   InterServerEvents,
   SocketData,
 } from "./types";
+import logger from "../utils/logger";
+import { createErrorLog } from "../utils/errorHandler";
 
 let io: SocketIOServer<
   ClientToServerEvents,
@@ -26,7 +28,7 @@ export function setupSocketIO(
   SocketData
 > {
   if (io) {
-    console.log("Cleaning up existing Socket.IO server");
+    logger.info("Cleaning up existing Socket.IO server");
     io.disconnectSockets(true);
     io.close();
   }
@@ -59,23 +61,21 @@ export function setupSocketIO(
     try {
       const userId = socket.handshake.auth.userId as string | undefined;
       if (userId) {
-        console.log(`Socket auth: User ID ${userId} provided in auth payload`);
+        logger.debug("Socket auth: User ID provided in auth payload", { userId });
         const user = getUserById(userId);
         if (user) {
           socket.data.userId = userId;
           socket.data.user = user;
-          console.log(`Socket auth: User ${userId} authenticated successfully`);
+          logger.info("Socket auth: User authenticated successfully", { userId });
           return next();
         } else {
-          console.log(`Socket auth: User ${userId} not found in database`);
+          logger.warn("Socket auth: User not found in database", { userId });
         }
       }
 
       if (config.nodeEnv === "development") {
         if (userId) {
-          console.log(
-            `Socket auth [DEV]: Allowing user ${userId} in development mode`
-          );
+          logger.debug("Socket auth: Development mode - allowing connection", { userId });
           socket.data.userId = userId;
           const user = getUserById(userId);
           if (user) {
@@ -87,17 +87,20 @@ export function setupSocketIO(
 
       return next(new Error("Authentication required"));
     } catch (err) {
-      console.error("Socket authentication error:", err);
+      logger.error("Socket authentication error", createErrorLog(err));
       next(new Error("Authentication failed"));
     }
   });
 
   io.on("connection", (socket) => {
-    console.log(`New socket connection: ${socket.id}`);
+    logger.info("New socket connection", { 
+      socketId: socket.id, 
+      userId: socket.data.userId 
+    });
     handleConnection(io!, socket);
   });
 
-  console.log("Socket.IO server initialized");
+  logger.info("Socket.IO server initialized successfully");
   return io;
 }
 
@@ -107,7 +110,7 @@ export function getSocketServer() {
 
 export function closeSocketServer() {
   if (io) {
-    console.log("Closing Socket.IO server");
+    logger.info("Closing Socket.IO server");
     io.disconnectSockets(true);
     io.close();
     io = null;

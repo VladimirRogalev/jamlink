@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
 import { FaMusic } from "react-icons/fa";
 import { PiMusicNoteSimpleFill } from "react-icons/pi";
+import logger from "../../utils/logger";
 
 import styles from "./Player.module.scss";
 import AdminPlayer from "../../components/AdminPlayer/AdminPlayer";
@@ -35,7 +36,7 @@ function PlayerPage() {
 
   const handleQuit = useCallback(() => {
     if (user?.id) {
-      console.log("Quitting song");
+      logger.info("User quitting song", { userId: user.id });
       quitSong();
     }
   }, [quitSong, user?.id]);
