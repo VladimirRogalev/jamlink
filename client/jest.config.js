@@ -5,8 +5,22 @@ export default {
     '**/__tests__/**/*.ts',
     '**/?(*.)+(spec|test).ts'
   ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '.*/__tests__/global\\.d\\.ts$'
+  ],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: {
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        module: 'esnext',
+        target: 'es2020',
+        moduleResolution: 'node',
+        types: ['jest', 'node']
+      }
+    }],
   },
   collectCoverageFrom: [
     'src/**/*.ts',

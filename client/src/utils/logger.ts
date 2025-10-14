@@ -11,8 +11,29 @@ interface LogEntry {
 }
 
 class ClientLogger {
-  private isDevelopment = import.meta.env.MODE === 'development';
-  private logLevel: LogLevel = this.isDevelopment ? 'debug' : 'info';
+  private get isDevelopment(): boolean {
+    return this.getEnvironmentMode() === 'development';
+  }
+  
+  private get logLevel(): LogLevel {
+    return this.isDevelopment ? 'debug' : 'info';
+  }
+  
+  private getEnvironmentMode(): string {
+    // Check if we're in a test environment
+    if (typeof global !== 'undefined' && (global as any).import?.meta?.env?.MODE) {
+      return (global as any).import.meta.env.MODE;
+    }
+    // Check if we're in a browser environment with Vite
+    try {
+      // Use eval to avoid TypeScript compilation issues with import.meta
+      const mode = eval('import.meta.env.MODE');
+      return mode || 'development';
+    } catch {
+      // Default to development for safety
+      return 'development';
+    }
+  }
   
   private levels: Record<LogLevel, number> = {
     error: 0,
@@ -51,7 +72,9 @@ class ClientLogger {
     
     // In production send to server
     if (!this.isDevelopment) {
-      this.sendToServer(level, message, data);
+      this.sendToServer(level, message, data).catch(error => {
+        console.error('Failed to send log to server:', error);
+      });
     } else {
       // In development output to console
       console.log(formattedMessage);

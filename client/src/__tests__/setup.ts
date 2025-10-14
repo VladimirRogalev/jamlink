@@ -6,6 +6,8 @@ const localStorageMock = {
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
+  length: 0,
+  key: jest.fn(),
 };
 (global as any).localStorage = localStorageMock;
 
@@ -15,6 +17,8 @@ const sessionStorageMock = {
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
+  length: 0,
+  key: jest.fn(),
 };
 (global as any).sessionStorage = sessionStorageMock;
 
@@ -30,3 +34,25 @@ const sessionStorageMock = {
   info: jest.fn(),
   debug: jest.fn(),
 };
+
+// Mock import.meta for Vite
+Object.defineProperty(global, 'import', {
+  value: {
+    meta: {
+      env: {
+        MODE: 'test',
+        DEV: false,
+        PROD: true,
+        SSR: false,
+      },
+    },
+  },
+  writable: true,
+});
+
+// Test to ensure setup file is recognized by Jest
+describe('Jest Setup', () => {
+  it('should load test environment variables', () => {
+    expect(process.env.NODE_ENV).toBeDefined();
+  });
+});
