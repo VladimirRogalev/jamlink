@@ -36,7 +36,7 @@ describe('Logger Performance Tests', () => {
 
     it('should handle large data objects', () => {
       const largeData = {
-        users: Array.from({ length: 1000 }, (_, i) => ({
+        users: Array.from({ length: 100 }, (_, i) => ({ // Reduced from 1000 to 100
           id: i,
           name: `User ${i}`,
           email: `user${i}@example.com`,

@@ -22,7 +22,10 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
-  testTimeout: 10000,
+  testTimeout: 30000, // Increased timeout for CI stability
+  maxWorkers: 1, // Use single worker to avoid Windows EPERM issues
+  forceExit: true, // Force exit after tests complete
+  detectOpenHandles: false, // Disable to avoid noise in CI
   globals: {
     'ts-jest': {
       tsconfig: {

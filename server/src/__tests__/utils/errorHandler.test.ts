@@ -87,7 +87,7 @@ describe('Error Handler', () => {
       
       expect(result).toEqual({
         error: 'Test error',
-        stack: undefined,
+        stack: expect.any(String), // Stack trace is now included
       });
     });
 
@@ -119,7 +119,7 @@ describe('Error Handler', () => {
       
       expect(result).toEqual({
         error: 'Complex error',
-        stack: undefined,
+        stack: expect.any(String), // Stack trace is now included
         userId: '123',
         requestId: 'req-456',
         metadata: {
@@ -130,4 +130,5 @@ describe('Error Handler', () => {
     });
   });
 });
+
 

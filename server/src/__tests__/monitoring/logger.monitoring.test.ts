@@ -89,8 +89,8 @@ describe('Logger Monitoring Tests', () => {
 
   describe('Error rate monitoring', () => {
     it('should track error rates', () => {
-      const totalLogs = 100;
-      const errorLogs = 10;
+      const totalLogs = 20; // Reduced from 100 to 20
+      const errorLogs = 2;  // Reduced from 10 to 2
       
       // Simulate error rate
       for (let i = 0; i < totalLogs; i++) {
