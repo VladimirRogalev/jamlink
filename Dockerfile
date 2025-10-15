@@ -10,6 +10,8 @@ COPY server/package*.json ./server/
 
 # Install ALL dependencies (including dev) for building
 RUN npm ci
+RUN cd client && npm ci
+RUN cd server && npm ci
 
 # Copy source code
 COPY . .
