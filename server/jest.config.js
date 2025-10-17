@@ -23,9 +23,10 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
   testTimeout: 30000, // Increased timeout for CI stability
-  maxWorkers: 1, // Use single worker to avoid Windows EPERM issues
+  maxWorkers: process.env.CI ? 1 : '50%', // Single worker in CI, multiple locally
   forceExit: true, // Force exit after tests complete
   detectOpenHandles: false, // Disable to avoid noise in CI
+  bail: process.env.CI ? 1 : false, // Stop on first failure in CI
   globals: {
     'ts-jest': {
       tsconfig: {

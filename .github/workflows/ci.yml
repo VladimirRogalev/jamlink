@@ -41,11 +41,13 @@ jobs:
       run: cd server && npm test
       env:
         NODE_ENV: test
+        CI: true
     
     - name: Run client tests
       run: cd client && npm test
       env:
         NODE_ENV: test
+        CI: true
     
     - name: Generate server coverage
       run: cd server && npm run test:coverage
