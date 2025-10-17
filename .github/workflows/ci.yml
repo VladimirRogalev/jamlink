@@ -55,17 +55,25 @@ jobs:
     - name: Generate client coverage
       run: cd client && npm run test:coverage
     
+    - name: Check coverage files exist
+      run: |
+        echo "Checking coverage files..."
+        ls -la server/coverage/ || echo "Server coverage not found"
+        ls -la client/coverage/ || echo "Client coverage not found"
+    
     - name: Upload server coverage to Codecov
       uses: codecov/codecov-action@v3
+      if: success() && hashFiles('server/coverage/lcov.info') != ''
       with:
-        file: ./server/coverage/lcov.info
+        file: server/coverage/lcov.info
         flags: server
         name: server-coverage
     
     - name: Upload client coverage to Codecov
       uses: codecov/codecov-action@v3
+      if: success() && hashFiles('client/coverage/lcov.info') != ''
       with:
-        file: ./client/coverage/lcov.info
+        file: client/coverage/lcov.info
         flags: client
         name: client-coverage
 
@@ -76,7 +84,7 @@ jobs:
     
     steps:
     - name: Notify Telegram
-      uses: appleboy/telegram-action@v1.0.0
+      uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
