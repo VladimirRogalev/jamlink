@@ -1,5 +1,5 @@
 import logger from '../../utils/logger';
-import { getErrorInfo, createErrorLog } from '../../utils/errorHandler';
+import { createErrorLog } from '../../utils/errorHandler';
 
 // Skip validation tests in CI due to performance constraints
 const describeOrSkip = process.env.CI ? describe.skip : describe;
