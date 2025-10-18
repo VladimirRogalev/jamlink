@@ -13,6 +13,13 @@ export interface ISongItem {
   chords?: string;
 }
 
+export const USER_ROLES = {
+  ADMIN: "admin",
+  USER: "user",
+} as const;
+
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+
 export interface IUserCredentials {
   username: string;
   password?: string;
@@ -38,13 +45,6 @@ export interface IUser {
   groupName?: string;
   imageUrl?: string;
 }
-
-export const UserRole = {
-  ADMIN: "admin",
-  USER: "user",
-} as const;
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export interface IGoogleUserProfile {
   googleId: string;

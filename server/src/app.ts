@@ -127,7 +127,7 @@ app.use("/groups", groupsRouter);
 app.use("/crawler", crawlerRouter);
 
 if (config.nodeEnv === "development") {
-  app.get("*", (req: Request, res: Response, next: NextFunction) => {
+  app.get("*", (req: Request, res: Response, _next: NextFunction) => {
     const clientDistPath = join(__dirname, "../../client/dist");
     const indexPath = join(clientDistPath, "index.html");
 

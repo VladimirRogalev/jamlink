@@ -85,7 +85,7 @@ export async function updateGroup(
   }
 
   // Don't allow updating certain fields
-  const { id: _, adminId: __, createdAt: ___, ...updateData } = data;
+  const { id: _id, adminId: _adminId, createdAt: _createdAt, ...updateData } = data;
 
   if (updateData.name && updateData.name !== groups[index].name) {
     const existingGroup = getGroupByName(updateData.name);

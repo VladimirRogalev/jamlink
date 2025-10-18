@@ -1,5 +1,5 @@
 import { Server as HttpServer } from "http";
-import { Socket, Server as SocketIOServer } from "socket.io";
+import { Server as SocketIOServer } from "socket.io";
 import config from "../config";
 import { handleConnection } from "./events.controller";
 import { getUserById } from "../services/users.service";

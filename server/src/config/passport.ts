@@ -20,9 +20,9 @@ passport.deserializeUser((id: string, done) => {
       return done(null, false);
     }
 
-    const { password, googleId, ...userWithoutSensitiveInfo } = user;
+    const { password: _password, googleId: _googleId, ...userWithoutSensitiveInfo } = user;
     done(null, userWithoutSensitiveInfo);
-  } catch (error) {
+  } catch {
     done(null, false);
   }
 });
@@ -56,7 +56,7 @@ passport.use(
           });
         }
 
-        const { password: _, googleId, ...userWithoutSensitiveInfo } = user;
+        const { password: _password, googleId: _googleId, ...userWithoutSensitiveInfo } = user;
         return done(null, userWithoutSensitiveInfo);
       } catch (error) {
         return done(error);
@@ -86,7 +86,7 @@ passport.use(
           role: "user",
         });
 
-        const { password, ...userWithoutPassword } = user;
+        const { password: _password, ...userWithoutPassword } = user;
         return done(null, userWithoutPassword);
       } catch (error) {
         return done(error);

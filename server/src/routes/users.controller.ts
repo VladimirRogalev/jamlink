@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as UsersService from "../services/users.service";
 import * as GroupsService from "../services/groups.service";
-import { IUser, UserRole } from "../models/types";
+import { IUser, USER_ROLES } from "../models/types";
 
 export async function updateUserProfile(
   req: Request,
@@ -86,7 +86,7 @@ export async function updateUserGroup(
     }
 
     const currentUser = UsersService.getUserById(userId);
-    if (currentUser?.role === UserRole.ADMIN) {
+    if (currentUser?.role === USER_ROLES.ADMIN) {
       res.status(403).json({
         success: false,
         message: "Admin users cannot change their group",

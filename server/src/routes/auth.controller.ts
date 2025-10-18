@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import * as UsersService from "../services/users.service";
 import * as GroupsService from "../services/groups.service";
-import { IUser, UserRole } from "../models/types";
+import { IUser, USER_ROLES } from "../models/types";
 
 // Default session options - 24 hours
 const DEFAULT_SESSION_OPTIONS = {
@@ -28,7 +28,7 @@ async function registerUser(
     throw new Error("Username already exists");
   }
 
-  if (role === UserRole.ADMIN) {
+  if (role === USER_ROLES.ADMIN) {
     if (!groupName || groupName.trim().length < 3) {
       throw new Error("Group name is required for admin (min. 3 characters)");
     }
@@ -44,7 +44,7 @@ async function registerUser(
     role,
   });
 
-  if (role === UserRole.ADMIN && groupName) {
+  if (role === USER_ROLES.ADMIN && groupName) {
     try {
       const newGroup = await GroupsService.createGroup(groupName, newUser.id);
 
@@ -53,7 +53,7 @@ async function registerUser(
     } catch (error) {
       console.error("Error creating group during registration:", error);
     }
-  } else if (role === UserRole.USER && groupName) {
+  } else if (role === USER_ROLES.USER && groupName) {
     const group = GroupsService.getGroupByName(groupName);
     if (group) {
       await UsersService.updateUser(newUser.id, { groupId: group.id });
@@ -62,7 +62,7 @@ async function registerUser(
     // If group doesn't exist, don't throw an error - user will need to select a group later
   }
 
-  const { password, ...userWithoutPassword } = newUser;
+  const { password: _password, ...userWithoutPassword } = newUser;
   return userWithoutPassword;
 }
 
@@ -125,8 +125,8 @@ function handleRegister(role: UserRole) {
   };
 }
 
-export const register = handleRegister(UserRole.USER);
-export const registerAdmin = handleRegister(UserRole.ADMIN);
+export const register = handleRegister(USER_ROLES.USER);
+export const registerAdmin = handleRegister(USER_ROLES.ADMIN);
 
 export function login(req: Request, res: Response, next: NextFunction): void {
   passport.authenticate(

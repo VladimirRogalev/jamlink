@@ -1,6 +1,6 @@
 import { createReadStream, createWriteStream } from "fs";
 import * as path from "path";
-import { IUser, UserRole, IGoogleUserProfile } from "../models/types";
+import { IUser, IGoogleUserProfile, USER_ROLES } from "../models/types";
 import { hashPassword } from "../utils/auth";
 import { randomUUID } from "crypto";
 import { getGroupById, getGroupByName } from "./groups.service";
@@ -96,7 +96,7 @@ export async function findOrCreateGoogleUser(
     email: profile.email,
     googleId: profile.googleId,
     displayName: profile.displayName,
-    role: profile.role || UserRole.USER,
+    role: profile.role || USER_ROLES.USER,
     imageUrl: profile.imageUrl,
     // No password needed for Google-authenticated users
   });
@@ -116,7 +116,7 @@ export async function addUser(userData: Omit<IUser, "id">): Promise<IUser> {
   const newUser: IUser = {
     ...userData,
     id: randomUUID(),
-    role: userData.role || UserRole.USER,
+    role: userData.role || USER_ROLES.USER,
   };
 
   // Only hash password if one is provided (not for Google auth)
@@ -127,7 +127,7 @@ export async function addUser(userData: Omit<IUser, "id">): Promise<IUser> {
   users.push(newUser);
   await saveUsers();
 
-  const { password, googleId, ...userWithoutSensitiveInfo } = newUser;
+  const { password: _password, googleId: _googleId, ...userWithoutSensitiveInfo } = newUser;
   return userWithoutSensitiveInfo as IUser;
 }
 
@@ -162,7 +162,7 @@ export async function updateUser(
   users[userIndex] = updatedUser;
   await saveUsers();
 
-  const { password, googleId, ...userWithoutSensitiveInfo } = updatedUser;
+  const { password: _password, googleId: _googleId, ...userWithoutSensitiveInfo } = updatedUser;
   return userWithoutSensitiveInfo;
 }
 
@@ -172,7 +172,7 @@ export async function getUserWithGroupDetails(userId: string): Promise<any> {
     return null;
   }
 
-  const { password, googleId, ...userInfo } = user;
+  const { password: _password, googleId: _googleId, ...userInfo } = user;
 
   if (user.groupId) {
     const group = getGroupById(user.groupId);
@@ -212,7 +212,7 @@ export async function updateUserGroup(
 
   await saveUsers();
 
-  const { password, googleId, ...userWithoutSensitiveInfo } = users[userIndex];
+  const { password: _password, googleId: _googleId, ...userWithoutSensitiveInfo } = users[userIndex];
   return userWithoutSensitiveInfo;
 }
 

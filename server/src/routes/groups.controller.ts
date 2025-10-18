@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as GroupsService from "../services/groups.service";
 import * as UsersService from "../services/users.service";
-import { IUser, UserRole } from "../models/types";
+import { IUser, USER_ROLES } from "../models/types";
 
 export async function getAllGroups(
   _req: Request,
@@ -89,7 +89,7 @@ export async function createGroup(req: Request, res: Response): Promise<void> {
     }
 
     const user = req.user as IUser;
-    if (user.role !== UserRole.ADMIN) {
+    if (user.role !== USER_ROLES.ADMIN) {
       res.status(403).json({
         success: false,
         message: "Only admins can create groups",
@@ -159,7 +159,7 @@ export async function createGroupAndPromote(
     }
 
     const user = req.user as IUser;
-    if (user.role === UserRole.ADMIN) {
+    if (user.role === USER_ROLES.ADMIN) {
       res.status(403).json({
         success: false,
         message: "User is already an admin",
@@ -187,7 +187,7 @@ export async function createGroupAndPromote(
     }
 
     const updatedUser = await UsersService.updateUser(user.id, {
-      role: UserRole.ADMIN,
+      role: USER_ROLES.ADMIN,
     });
 
     if (!updatedUser) {
@@ -260,7 +260,7 @@ export async function getGroupUsers(
     }
 
     const users = UsersService.getUsersInGroup(id).map(
-      ({ password, googleId, ...user }) => user
+      ({ password: _password, googleId: _googleId, ...user }) => user
     );
 
     res.status(200).json({

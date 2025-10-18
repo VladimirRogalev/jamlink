@@ -1,5 +1,5 @@
 import request from 'supertest';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 
 // Mock the logger BEFORE importing anything else
 jest.mock('../../utils/logger', () => ({
@@ -32,14 +32,16 @@ jest.mock('bcryptjs', () => ({
 
 // Now import after mocks
 import { authRouter } from '../../routes/auth.router';
-import logger from '../../utils/logger';
+// Remove unused logger import since we're not testing logger calls
+// import logger from '../../utils/logger';
 
-const mockLogger = logger as jest.Mocked<typeof logger>;
+// Remove unused mockLogger since we're not testing logger calls
+// const mockLogger = logger as jest.Mocked<typeof logger>;
 
 // Mock passport
 jest.mock('passport', () => ({
   authenticate: jest.fn((strategy, callback) => {
-    return (req: any, res: any, next: any) => {
+    return (req: Request, res: Response, next: NextFunction) => {
       // Mock successful authentication
       if (callback) {
         callback(null, { id: '1', username: 'testuser', email: 'test@example.com', role: 'user' }, null);
@@ -60,13 +62,13 @@ const app = express();
 app.use(express.json());
 
 // Add middleware to mock req.login
-app.use((req: any, res: any, next: any) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   req.session = {};
-  req.login = jest.fn((user: any, callback: any) => {
+  req.login = jest.fn((user: Express.User, callback: (err?: Error) => void) => {
     req.user = user;
     if (callback) callback();
   });
-  req.logout = jest.fn((callback: any) => {
+  req.logout = jest.fn((callback: (err?: Error) => void) => {
     req.user = null;
     if (callback) callback();
   });
@@ -155,7 +157,7 @@ describe('Auth Routes', () => {
       // Mock passport to return successful user
       const passport = require('passport');
       passport.authenticate.mockImplementation((strategy: any, callback: any) => {
-        return (req: any, res: any, next: any) => {
+        return (req: Request, res: Response, next: NextFunction) => {
           if (callback) {
             callback(null, { id: '1', username: 'testuser', email: 'test@example.com', role: 'user' }, null);
           }
@@ -181,7 +183,7 @@ describe('Auth Routes', () => {
       // Mock passport to return no user (authentication failed)
       const passport = require('passport');
       passport.authenticate.mockImplementation((strategy: any, callback: any) => {
-        return (req: any, res: any, next: any) => {
+        return (req: Request, res: Response, next: NextFunction) => {
           if (callback) {
             callback(null, null, { message: 'Invalid username or password' });
           }
