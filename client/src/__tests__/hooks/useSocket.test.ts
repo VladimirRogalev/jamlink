@@ -7,7 +7,7 @@ jest.mock('../../utils/logger');
 // Mock Redux
 jest.mock('../../hooks/redux-hooks', () => ({
   useAppDispatch: () => jest.fn(),
-  useAppSelector: (selector: any) => selector({
+  useAppSelector: (selector: (state: unknown) => unknown) => selector({
     auth: { user: { id: '123' } },
     socket: { connected: false, currentSong: null, isLoading: false, isInit: false }
   })

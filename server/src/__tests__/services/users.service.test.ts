@@ -27,7 +27,7 @@ describe('Users Service', () => {
         { id: '2', username: 'user2', email: 'user2@test.com' },
       ];
 
-      const mockStream: any = {
+      const mockStream: { on: jest.MockedFunction<(event: string, callback: Function) => unknown> } = {
         on: jest.fn((event: string, callback: Function) => {
           if (event === 'data') {
             callback(JSON.stringify(mockUsers));
@@ -46,7 +46,7 @@ describe('Users Service', () => {
     });
 
     it('should handle JSON parsing errors', async () => {
-      const mockStream: any = {
+      const mockStream: { on: jest.MockedFunction<(event: string, callback: Function) => unknown> } = {
         on: jest.fn((event: string, callback: Function) => {
           if (event === 'data') {
             callback('invalid json');
@@ -67,7 +67,7 @@ describe('Users Service', () => {
     });
 
     it('should handle file read errors', async () => {
-      const mockStream: any = {
+      const mockStream: { on: jest.MockedFunction<(event: string, callback: Function) => unknown> } = {
         on: jest.fn((event: string, callback: Function) => {
           if (event === 'error') {
             callback(new Error('File read error'));

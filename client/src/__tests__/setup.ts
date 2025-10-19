@@ -9,7 +9,7 @@ const localStorageMock = {
   length: 0,
   key: jest.fn(),
 };
-(global as any).localStorage = localStorageMock;
+(global as unknown as { localStorage: typeof localStorageMock }).localStorage = localStorageMock;
 
 // Mock sessionStorage
 const sessionStorageMock = {
@@ -20,13 +20,13 @@ const sessionStorageMock = {
   length: 0,
   key: jest.fn(),
 };
-(global as any).sessionStorage = sessionStorageMock;
+(global as unknown as { sessionStorage: typeof sessionStorageMock }).sessionStorage = sessionStorageMock;
 
 // Mock fetch
-(global as any).fetch = jest.fn();
+(global as unknown as { fetch: jest.MockedFunction<typeof fetch> }).fetch = jest.fn();
 
 // Mock console methods to avoid noise in tests
-(global as any).console = {
+(global as unknown as { console: typeof console }).console = {
   ...console,
   log: jest.fn(),
   error: jest.fn(),

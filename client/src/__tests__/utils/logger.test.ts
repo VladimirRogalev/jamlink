@@ -13,7 +13,7 @@ const mockLocalStorage = {
   length: 0,
   key: jest.fn(),
 };
-global.localStorage = mockLocalStorage as any;
+global.localStorage = mockLocalStorage as unknown as Storage;
 
 // Mock sessionStorage
 const mockSessionStorage = {
@@ -24,7 +24,7 @@ const mockSessionStorage = {
   length: 0,
   key: jest.fn(),
 };
-global.sessionStorage = mockSessionStorage as any;
+global.sessionStorage = mockSessionStorage as unknown as Storage;
 
 describe('Client Logger', () => {
   beforeEach(() => {
@@ -33,8 +33,8 @@ describe('Client Logger', () => {
     mockSessionStorage.getItem.mockReturnValue('session-123');
     
     // Set test environment to development mode so logs are output to console
-    Object.defineProperty((global as any).import.meta, 'env', {
-      value: { MODE: 'development' },
+    Object.defineProperty((global as any).import, 'meta', {
+      value: { env: { MODE: 'development' } },
       writable: true,
     });
   });
@@ -130,8 +130,8 @@ describe('Client Logger', () => {
   describe('Production mode', () => {
     it('should send logs to server in production', async () => {
       // Mock production environment
-      const originalEnv = (global as any).import.meta.env.MODE;
-      Object.defineProperty((global as any).import.meta, 'env', {
+      const originalEnv = (global as any).import?.meta?.env?.MODE;
+      Object.defineProperty((global as any).import, 'meta', {
         value: { MODE: 'production' },
         writable: true,
       });
@@ -144,7 +144,7 @@ describe('Client Logger', () => {
       logger.info(message, data);
       
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       expect(mockFetch).toHaveBeenCalledWith('/api/logs', {
         method: 'POST',
@@ -155,16 +155,16 @@ describe('Client Logger', () => {
       });
 
       // Restore original environment
-      Object.defineProperty((global as any).import.meta, 'env', {
-        value: { MODE: originalEnv },
+      Object.defineProperty((global as any).import, 'meta', {
+        value: { env: { MODE: originalEnv } },
         writable: true,
       });
     });
 
     it('should handle server send errors', async () => {
       // Mock production environment
-      const originalEnv = (global as any).import.meta.env.MODE;
-      Object.defineProperty((global as any).import.meta, 'env', {
+      const originalEnv = (global as any).import?.meta?.env?.MODE;
+      Object.defineProperty((global as any).import, 'meta', {
         value: { MODE: 'production' },
         writable: true,
       });
@@ -174,7 +174,7 @@ describe('Client Logger', () => {
       logger.info('Test message');
       
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       expect(console.error).toHaveBeenCalledWith(
         'Failed to send log to server:',
@@ -182,8 +182,8 @@ describe('Client Logger', () => {
       );
 
       // Restore original environment
-      Object.defineProperty((global as any).import.meta, 'env', {
-        value: { MODE: originalEnv },
+      Object.defineProperty((global as any).import, 'meta', {
+        value: { env: { MODE: originalEnv } },
         writable: true,
       });
     });

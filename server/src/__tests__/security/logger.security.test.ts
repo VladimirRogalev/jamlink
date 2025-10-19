@@ -34,7 +34,7 @@ describe('Logger Security Tests', () => {
     });
 
     it('should handle circular references', () => {
-      const circularObj: any = { name: 'test' };
+      const circularObj: Record<string, unknown> = { name: 'test' };
       circularObj.self = circularObj;
 
       expect(() => {
@@ -43,7 +43,7 @@ describe('Logger Security Tests', () => {
     });
 
     it('should handle very deep objects', () => {
-      let deepObj: any = { value: 'test' };
+      let deepObj: Record<string, unknown> = { value: 'test' };
       for (let i = 0; i < 1000; i++) {
         deepObj = { nested: deepObj };
       }

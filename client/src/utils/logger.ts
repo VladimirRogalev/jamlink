@@ -4,7 +4,7 @@ type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 interface LogEntry {
   level: LogLevel;
   message: string;
-  data?: any;
+  data?: unknown;
   timestamp: string;
   userId?: string;
   sessionId?: string;
@@ -22,7 +22,7 @@ class ClientLogger {
   private getEnvironmentMode(): string {
     // Check if we're in a test environment
     if (typeof global !== 'undefined' && (global as any).import?.meta?.env?.MODE) {
-      return (global as any).import.meta.env.MODE;
+      return (global as any).import.meta.env.MODE as string;
     }
     // Check if we're in a browser environment with Vite
     try {
@@ -53,7 +53,7 @@ class ClientLogger {
     return this.levels[level] <= this.levels[this.logLevel];
   }
 
-  private formatMessage(level: LogLevel, message: string, data?: any): string {
+  private formatMessage(level: LogLevel, message: string, data?: unknown): string {
     const timestamp = new Date().toISOString();
     const color = this.colors[level];
     const prefix = `${color} [${level.toUpperCase()}] ${timestamp}`;
@@ -65,7 +65,7 @@ class ClientLogger {
     return `${prefix} ${message}`;
   }
 
-  private log(level: LogLevel, message: string, data?: any): void {
+  private log(level: LogLevel, message: string, data?: unknown): void {
     if (!this.shouldLog(level)) return;
 
     const formattedMessage = this.formatMessage(level, message, data);
@@ -81,7 +81,7 @@ class ClientLogger {
     }
   }
 
-  private async sendToServer(level: LogLevel, message: string, data?: any): Promise<void> {
+  private async sendToServer(level: LogLevel, message: string, data?: unknown): Promise<void> {
     try {
       const logEntry: LogEntry = {
         level,
@@ -127,19 +127,19 @@ class ClientLogger {
   }
 
   // Public methods
-  error(message: string, data?: any): void {
+  error(message: string, data?: unknown): void {
     this.log('error', message, data);
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, data?: unknown): void {
     this.log('warn', message, data);
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, data?: unknown): void {
     this.log('info', message, data);
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, data?: unknown): void {
     this.log('debug', message, data);
   }
 }

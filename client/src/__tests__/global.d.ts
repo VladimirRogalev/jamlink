@@ -1,21 +1,21 @@
 declare global {
-  var localStorage: {
+  const localStorage: {
     getItem: jest.Mock;
     setItem: jest.Mock;
     removeItem: jest.Mock;
     clear: jest.Mock;
   };
   
-  var sessionStorage: {
+  const sessionStorage: {
     getItem: jest.Mock;
     setItem: jest.Mock;
     removeItem: jest.Mock;
     clear: jest.Mock;
   };
   
-  var fetch: jest.Mock;
+  const fetch: jest.Mock;
   
-  var console: {
+  const console: {
     log: jest.Mock;
     error: jest.Mock;
     warn: jest.Mock;

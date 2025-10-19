@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import * as UsersService from "../services/users.service";
 import * as GroupsService from "../services/groups.service";
-import { IUser, USER_ROLES } from "../models/types";
+import { IUser, UserRole, USER_ROLES } from "../models/types";
 
 // Default session options - 24 hours
 const DEFAULT_SESSION_OPTIONS = {

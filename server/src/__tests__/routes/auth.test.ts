@@ -61,17 +61,23 @@ jest.mock('passport-local', () => {
 const app = express();
 app.use(express.json());
 
-// Add middleware to mock req.login
+// Add middleware to mock req.login and req.logout
 app.use((req: Request, res: Response, next: NextFunction) => {
   req.session = {};
-  req.login = jest.fn((user: Express.User, callback: (err?: Error) => void) => {
+  req.login = jest.fn() as any;
+  req.logout = jest.fn() as any;
+  
+  // Mock the actual behavior
+  (req.login as any).mockImplementation((user: Express.User, callback?: (err?: Error) => void) => {
     req.user = user;
     if (callback) callback();
   });
-  req.logout = jest.fn((callback: (err?: Error) => void) => {
-    req.user = null;
+  
+  (req.logout as any).mockImplementation((callback?: (err?: Error) => void) => {
+    req.user = undefined;
     if (callback) callback();
   });
+  
   next();
 });
 
@@ -156,7 +162,7 @@ describe('Auth Routes', () => {
 
       // Mock passport to return successful user
       const passport = require('passport');
-      passport.authenticate.mockImplementation((strategy: any, callback: any) => {
+      passport.authenticate.mockImplementation((strategy: string, callback: ((err: Error | null, user: Express.User | false, info?: unknown) => void) | undefined) => {
         return (req: Request, res: Response, next: NextFunction) => {
           if (callback) {
             callback(null, { id: '1', username: 'testuser', email: 'test@example.com', role: 'user' }, null);
@@ -182,10 +188,10 @@ describe('Auth Routes', () => {
 
       // Mock passport to return no user (authentication failed)
       const passport = require('passport');
-      passport.authenticate.mockImplementation((strategy: any, callback: any) => {
+      passport.authenticate.mockImplementation((strategy: string, callback: ((err: Error | null, user: Express.User | false, info?: unknown) => void) | undefined) => {
         return (req: Request, res: Response, next: NextFunction) => {
           if (callback) {
-            callback(null, null, { message: 'Invalid username or password' });
+            callback(null, false, { message: 'Invalid username or password' });
           }
           next();
         };
