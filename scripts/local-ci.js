@@ -26,6 +26,7 @@ function runCommand(command, cwd = process.cwd(), description = '') {
     const result = execSync(command, { 
       cwd, 
       stdio: 'pipe',
+      maxBuffer: 1024 * 1024 * 10,
       encoding: 'utf8'
     });
     log(`${colors.green}✅ Success${colors.reset}`);

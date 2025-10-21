@@ -4,7 +4,20 @@ import { createErrorLog } from '../../utils/errorHandler';
 // Skip monitoring tests in CI due to memory constraints
 const describeOrSkip = process.env.CI ? describe.skip : describe;
 
+// Mock logger to prevent console output overflow
+const originalLogLevel = process.env.LOG_LEVEL;
+
 describeOrSkip('Logger Monitoring Tests', () => {
+  beforeAll(() => {
+    // Set log level to error only to reduce output
+    process.env.LOG_LEVEL = 'error';
+  });
+
+  afterAll(() => {
+    // Restore original log level
+    process.env.LOG_LEVEL = originalLogLevel;
+  });
+
   describe('Log metrics', () => {
     it('should track log levels distribution', () => {
       const logCounts = {
@@ -58,43 +71,43 @@ describeOrSkip('Logger Monitoring Tests', () => {
   describe('Performance monitoring', () => {
     it('should monitor log processing time', () => {
       const startTime = process.hrtime.bigint();
-      
-      logger.info('Performance test message', { 
+
+      logger.info('Performance test message', {
         timestamp: Date.now(),
         data: 'test data',
       });
-      
+
       const endTime = process.hrtime.bigint();
       const duration = Number(endTime - startTime) / 1000000; // Convert to milliseconds
-      
+
       // Log processing should be fast (less than 10ms)
       expect(duration).toBeLessThan(10);
     });
 
     it('should monitor memory usage during logging', () => {
       const initialMemory = process.memoryUsage();
-      
-      // Perform logging operations
-      for (let i = 0; i < 50; i++) {
-        logger.info(`Memory test ${i}`, { 
+
+      // Reduced to 10 to prevent buffer overflow (was 50)
+      for (let i = 0; i < 10; i++) {
+        logger.info(`Memory test ${i}`, {
           data: `test data ${i}`,
           timestamp: Date.now(),
         });
       }
-      
+
       const finalMemory = process.memoryUsage();
       const memoryIncrease = finalMemory.heapUsed - initialMemory.heapUsed;
-      
-      // Memory increase should be reasonable (increased limit for CI environments)
-      expect(memoryIncrease).toBeLessThan(20 * 1024 * 1024); // Less than 20MB
+
+      // Memory increase should be reasonable (less than 5MB for 10 logs)
+      expect(memoryIncrease).toBeLessThan(5 * 1024 * 1024);
     });
   });
 
   describe('Error rate monitoring', () => {
     it('should track error rates', () => {
-      const totalLogs = 20; // Reduced from 100 to 20
-      const errorLogs = 2;  // Reduced from 10 to 2
-      
+      const totalLogs = 10; // Further reduced from 20 to 10
+      const errorLogs = 1;  // Reduced from 2 to 1
+
       // Simulate error rate
       for (let i = 0; i < totalLogs; i++) {
         if (i < errorLogs) {
@@ -103,10 +116,9 @@ describeOrSkip('Logger Monitoring Tests', () => {
           logger.info(`Info ${i}`, { index: i });
         }
       }
-      
+
       const errorRate = errorLogs / totalLogs;
       expect(errorRate).toBe(0.1); // 10% error rate
     });
   });
 });
-
