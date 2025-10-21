@@ -10,31 +10,53 @@ interface LogEntry {
   sessionId?: string;
 }
 
+// Type for import.meta.env
+interface ImportMetaEnv {
+  MODE?: string;
+}
+
+interface CustomImportMeta {
+  env: ImportMetaEnv;
+}
+
+// Type for global with import.meta
+interface GlobalWithImportMeta {
+  import?: {
+    meta?: CustomImportMeta;
+  };
+}
+
 class ClientLogger {
   private get isDevelopment(): boolean {
     return this.getEnvironmentMode() === 'development';
   }
-  
+
   private get logLevel(): LogLevel {
     return this.isDevelopment ? 'debug' : 'info';
   }
-  
+
   private getEnvironmentMode(): string {
-    // Check if we're in a test environment
-    if (typeof global !== 'undefined' && (global as any).import?.meta?.env?.MODE) {
-      return (global as any).import.meta.env.MODE as string;
+    // First check NODE_ENV for tests
+    if (typeof process !== 'undefined' && process.env.NODE_ENV) {
+      return process.env.NODE_ENV;
     }
+
+    // Check if we're in a test environment
+    if (typeof global !== 'undefined' && (global as GlobalWithImportMeta).import?.meta?.env?.MODE) {
+      return (global as GlobalWithImportMeta).import!.meta!.env.MODE as string;
+    }
+
     // Check if we're in a browser environment with Vite
     try {
       // Use eval to avoid TypeScript compilation issues with import.meta
-      const mode = eval('import.meta.env.MODE');
+      const mode = eval('import.meta.env.MODE') as string | undefined;
       return mode || 'development';
     } catch {
       // Default to development for safety
       return 'development';
     }
   }
-  
+
   private levels: Record<LogLevel, number> = {
     error: 0,
     warn: 1,
@@ -57,11 +79,11 @@ class ClientLogger {
     const timestamp = new Date().toISOString();
     const color = this.colors[level];
     const prefix = `${color} [${level.toUpperCase()}] ${timestamp}`;
-    
+
     if (data) {
       return `${prefix} ${message}\n${JSON.stringify(data, null, 2)}`;
     }
-    
+
     return `${prefix} ${message}`;
   }
 
@@ -69,7 +91,7 @@ class ClientLogger {
     if (!this.shouldLog(level)) return;
 
     const formattedMessage = this.formatMessage(level, message, data);
-    
+
     // In production send to server
     if (!this.isDevelopment) {
       this.sendToServer(level, message, data).catch(error => {
@@ -82,6 +104,7 @@ class ClientLogger {
   }
 
   private async sendToServer(level: LogLevel, message: string, data?: unknown): Promise<void> {
+
     try {
       const logEntry: LogEntry = {
         level,
@@ -147,4 +170,7 @@ class ClientLogger {
 // Create single logger instance
 const logger = new ClientLogger();
 
+// Export both the instance and the class for testing
+export { ClientLogger };
+export type { LogLevel, LogEntry };
 export default logger;

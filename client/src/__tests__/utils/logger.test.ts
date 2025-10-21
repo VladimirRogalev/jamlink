@@ -1,4 +1,4 @@
-import logger from '../../utils/logger';
+import logger, { ClientLogger } from '../../utils/logger';
 
 // Mock fetch
 const mockFetch = jest.fn();
@@ -31,9 +31,9 @@ describe('Client Logger', () => {
     jest.clearAllMocks();
     mockLocalStorage.getItem.mockReturnValue('{"id":"123"}');
     mockSessionStorage.getItem.mockReturnValue('session-123');
-    
+
     // Set test environment to development mode so logs are output to console
-    Object.defineProperty((global as any).import, 'meta', {
+    Object.defineProperty((global as Record<string, unknown>).import, 'meta', {
       value: { env: { MODE: 'development' } },
       writable: true,
     });
@@ -43,44 +43,44 @@ describe('Client Logger', () => {
     it('should call error method', () => {
       const message = 'Test error message';
       const data = { error: 'test error' };
-      
+
       logger.error(message, data);
-      
+
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('🔴 [ERROR]')
+          expect.stringContaining('🔴 [ERROR]')
       );
     });
 
     it('should call warn method', () => {
       const message = 'Test warning message';
       const data = { warning: 'test warning' };
-      
+
       logger.warn(message, data);
-      
+
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('🟡 [WARN]')
+          expect.stringContaining('🟡 [WARN]')
       );
     });
 
     it('should call info method', () => {
       const message = 'Test info message';
       const data = { info: 'test info' };
-      
+
       logger.info(message, data);
-      
+
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('🔵 [INFO]')
+          expect.stringContaining('🔵 [INFO]')
       );
     });
 
     it('should call debug method', () => {
       const message = 'Test debug message';
       const data = { debug: 'test debug' };
-      
+
       logger.debug(message, data);
-      
+
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('⚪ [DEBUG]')
+          expect.stringContaining('⚪ [DEBUG]')
       );
     });
   });
@@ -88,25 +88,25 @@ describe('Client Logger', () => {
   describe('Log formatting', () => {
     it('should format log message with timestamp', () => {
       const message = 'Test message';
-      
+
       logger.info(message);
-      
+
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringMatching(/🔵 \[INFO\] \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z Test message/)
+          expect.stringMatching(/🔵 \[INFO\] \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z Test message/)
       );
     });
 
     it('should format log message with data', () => {
       const message = 'Test message';
       const data = { key: 'value', number: 123 };
-      
+
       logger.info(message, data);
-      
+
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('Test message')
+          expect.stringContaining('Test message')
       );
       expect(console.log).toHaveBeenCalledWith(
-        expect.stringContaining('"key": "value"')
+          expect.stringContaining('"key": "value"')
       );
     });
   });
@@ -128,24 +128,48 @@ describe('Client Logger', () => {
   });
 
   describe('Production mode', () => {
+    it('should detect production mode correctly', () => {
+      // Mock production environment by setting NODE_ENV
+      const originalNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      // Clear any previous calls
+      jest.clearAllMocks();
+
+      // Create a new logger instance to pick up the new environment
+      const productionLogger = new ClientLogger();
+
+      // Check if logger correctly detects production mode by testing behavior
+      // In production mode, logs should be sent to server, not console
+      mockFetch.mockResolvedValue({ ok: true });
+
+      productionLogger.info('test');
+
+      // In production, console.log should NOT be called
+      expect(console.log).not.toHaveBeenCalled();
+
+      // Restore original environment
+      process.env.NODE_ENV = originalNodeEnv;
+    });
+
     it('should send logs to server in production', async () => {
-      // Mock production environment
-      const originalEnv = (global as any).import?.meta?.env?.MODE;
-      Object.defineProperty((global as any).import, 'meta', {
-        value: { MODE: 'production' },
-        writable: true,
-      });
+      // Mock production environment by setting NODE_ENV
+      const originalNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
 
       mockFetch.mockResolvedValue({ ok: true });
 
       const message = 'Test message';
       const data = { test: 'data' };
-      
-      logger.info(message, data);
-      
+
+      // Create a new logger instance to pick up the new environment
+      const productionLogger = new ClientLogger();
+
+      productionLogger.info(message, data);
+
       // Wait for async operation
       await new Promise(resolve => setTimeout(resolve, 200));
-      
+
       expect(mockFetch).toHaveBeenCalledWith('/api/logs', {
         method: 'POST',
         headers: {
@@ -155,38 +179,30 @@ describe('Client Logger', () => {
       });
 
       // Restore original environment
-      Object.defineProperty((global as any).import, 'meta', {
-        value: { env: { MODE: originalEnv } },
-        writable: true,
-      });
+      process.env.NODE_ENV = originalNodeEnv;
     });
 
     it('should handle server send errors', async () => {
-      // Mock production environment
-      const originalEnv = (global as any).import?.meta?.env?.MODE;
-      Object.defineProperty((global as any).import, 'meta', {
-        value: { MODE: 'production' },
-        writable: true,
-      });
+      // Mock production environment by setting NODE_ENV
+      const originalNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
 
       mockFetch.mockRejectedValue(new Error('Network error'));
 
-      logger.info('Test message');
-      
+      // Create a new logger instance to pick up the new environment
+      const productionLogger = new ClientLogger();
+      productionLogger.info('Test message');
+
       // Wait for async operation
       await new Promise(resolve => setTimeout(resolve, 200));
-      
+
       expect(console.error).toHaveBeenCalledWith(
-        'Failed to send log to server:',
-        expect.any(Error)
+          'Failed to send log to server:',
+          expect.any(Error)
       );
 
       // Restore original environment
-      Object.defineProperty((global as any).import, 'meta', {
-        value: { env: { MODE: originalEnv } },
-        writable: true,
-      });
+      process.env.NODE_ENV = originalNodeEnv;
     });
   });
 });
-

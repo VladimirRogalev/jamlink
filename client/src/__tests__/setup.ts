@@ -40,15 +40,18 @@ Object.defineProperty(global, 'import', {
   value: {
     meta: {
       env: {
-        MODE: 'test',
-        DEV: false,
-        PROD: true,
+        MODE: 'development',
+        DEV: true,
+        PROD: false,
         SSR: false,
       },
     },
   },
   writable: true,
 });
+
+// Set NODE_ENV to development for tests
+process.env.NODE_ENV = 'development';
 
 // Test to ensure setup file is recognized by Jest
 describe('Jest Setup', () => {
